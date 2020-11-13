@@ -20,6 +20,60 @@ $ npm install @adobe/gh-resolve-ref
 
 See the [API documentation](docs/API.md).
 
+### Code examples
+
+```js
+const { resolve, ResolveError } = require('@adobe/gh-resolve-ref');
+
+const owner = 'adobe';
+const repo = 'gh-resolve-ref';
+let ref;
+
+let result;
+
+(async () => {
+  // resolving an existing ref returns { sha, fqRef }
+  ref = 'main'; // 'main' branch
+  result = await resolve({ owner, repo, ref });
+  console.log(`${owner}/${repo} ref: ${ref} => sha: ${result.sha}, fqRef: ${result.fqRef}`);
+  // => adobe/gh-resolve-ref ref: main => sha: 6374...8c26, fqRef: refs/heads/main
+
+
+  // resolving an unkown ref returns null
+  ref = 'doesnotexist'; // non-existing branch or tag
+  result = await resolve({ owner, repo, ref });
+  if (!result) {
+    console.log(`${owner}/${repo} ref: ${ref} => not found`);
+    // => adobe/gh-resolve-ref ref: doesnotexist => not found
+  }
+
+  // if no ref is specified: ref defaults to the default branch
+  result = await resolve({ owner, repo });
+  console.log(`${owner}/${repo} => default branch: ${result.fqRef}, HEAD: ${result.sha}`);
+  // => adobe/gh-resolve-ref => default branch: refs/heads/main, HEAD: 6374...8c26
+
+
+  try {
+    // calling without owner or repo -> TypeError
+    result = await resolve({ owner, ref: 'main' });
+  } catch (err) {
+    console.log(err);
+    // => TypeError: owner and repo are mandatory parameters
+  }
+
+  try {
+    // in case of a GitHub error -> ResolveError
+    result = await resolve({ owner, repo: 'unknown', ref: 'main' });
+  } catch (err) {
+    if (err instanceof ResolveError) {
+      console.log(`${err.name}: ${err.message}, statusCode: ${err.statusCode}`);
+      // => ResolveError: repository not found: adobe/unknown, statusCode: 404
+    }
+  }
+})();
+```
+
+
 ## Development
 
 ### Build
