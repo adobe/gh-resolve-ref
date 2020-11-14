@@ -2,7 +2,10 @@
 
 <dl>
 <dt><a href="#ResolveError">ResolveError</a></dt>
-<dd><p>ResolveError is thrown if the request to <code>github.com</code> failed.</p>
+<dd><p>ResolveError is thrown if the request to <code>github.com</code> failed with an HTTP error status.</p>
+</dd>
+<dt><a href="#NetworkError">NetworkError</a></dt>
+<dd><p>NetworkError is thrown if the request to <code>github.com</code> failed due to a network error.</p>
 </dd>
 </dl>
 
@@ -31,18 +34,32 @@
 <a name="ResolveError"></a>
 
 ## ResolveError
-ResolveError is thrown if the request to `github.com` failed.
+ResolveError is thrown if the request to `github.com` failed with an HTTP error status.
 
 **Kind**: global class  
 <a name="new_ResolveError_new"></a>
 
-### new ResolveError(message, statusCode, [err])
+### new ResolveError(message, statusCode)
 
 | Param | Type | Description |
 | --- | --- | --- |
 | message | <code>string</code> | error message |
 | statusCode | <code>number</code> | HTTP status code |
-| [err] | <code>Error</code> | underlying error (optional) |
+
+<a name="NetworkError"></a>
+
+## NetworkError
+NetworkError is thrown if the request to `github.com` failed due to a network error.
+
+**Kind**: global class  
+<a name="new_NetworkError_new"></a>
+
+### new NetworkError(message, err)
+
+| Param | Type | Description |
+| --- | --- | --- |
+| message | <code>string</code> | error message |
+| err | <code>Error</code> | underlying error |
 
 <a name="resolve"></a>
 
@@ -59,7 +76,8 @@ If the specified repository is private you have to provide a valid GitHub access
 **Throws**:
 
 - <code>TypeError</code> if `owner` and/or `repo` have not been specified.
-- [<code>ResolveError</code>](#ResolveError) if the request to `github.com` failed.
+- [<code>ResolveError</code>](#ResolveError) if the request to `github.com` failed with an HTTP error status.
+- [<code>NetworkError</code>](#NetworkError) if the request to `github.com` failed due to a network error.
 
 
 | Param | Type |
