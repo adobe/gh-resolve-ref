@@ -23,7 +23,7 @@ const FSPersister = require('@pollyjs/persister-fs');
 const { setupMocha: setupPolly } = require('@pollyjs/core');
 const nock = require('nock');
 
-const { resolve, ResolveError } = require('../src/index.js');
+const { resolve, ResolveError, NetworkError } = require('../src/index.js');
 
 const OWNER = 'adobe';
 const REPO = 'helix-resolve-git-ref';
@@ -66,6 +66,31 @@ describe('ResolveError Tests', () => {
     const statusCode = 599;
     const err = new ResolveError('foo', statusCode);
     assert.strictEqual(err.statusCode, statusCode);
+  });
+});
+
+describe('NetworkError Tests', () => {
+  it('NetworkError extends Error', () => {
+    const msg = 'error message';
+    const baseErr = new Error('test');
+    const err = new NetworkError(msg, baseErr);
+    assert(err instanceof Error);
+    assert.strictEqual(err.message, `${msg}: ${baseErr.message}`);
+  });
+
+  it('NetworkError overrides name and toString()', () => {
+    const msg = 'error message';
+    const baseErr = new Error('test');
+    const err = new NetworkError(msg, baseErr);
+    assert(err instanceof NetworkError);
+    assert.strictEqual(err.name, 'NetworkError');
+    assert.strictEqual(err.toString(), `NetworkError: ${msg}: ${baseErr.message} ${baseErr}`);
+  });
+
+  it('NetworkError has err property', () => {
+    const baseErr = new Error();
+    const err = new NetworkError('foo', baseErr);
+    assert.strictEqual(err.err, baseErr);
   });
 });
 
@@ -190,8 +215,7 @@ describe('network/server error tests', () => {
       return resolve({ owner: OWNER, repo: REPO, ref: SHORT_REF })
         .then(() => assert.fail('expected ResolveError'))
         .catch((err) => {
-          assert(err instanceof ResolveError);
-          assert.strictEqual(err.statusCode, 500);
+          assert(err instanceof NetworkError);
         });
     } finally {
       nock.cleanAll();

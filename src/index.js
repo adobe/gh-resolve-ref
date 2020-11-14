@@ -9,6 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+/* eslint-disable max-classes-per-file */
 
 'use strict';
 
@@ -17,18 +18,16 @@ const https = require('https');
 const DEFAULT_BRANCH_RE = /symref=HEAD:(\S+)/;
 
 /**
- * ResolveError is thrown if the request to `github.com` failed.
+ * ResolveError is thrown if the request to `github.com` failed with an HTTP error status.
  */
 class ResolveError extends Error {
   /**
    * @constructor
    * @param {string} message error message
    * @param {number} statusCode HTTP status code
-   * @param {Error} [err] underlying error (optional)
    */
-  constructor(message, statusCode, err) {
-    const msg = err instanceof Error ? `${message}: ${err.message}` : message;
-    super(msg);
+  constructor(message, statusCode) {
+    super(message);
 
     this.statusCode = statusCode;
   }
@@ -39,6 +38,29 @@ class ResolveError extends Error {
 
   toString() {
     return `${super.toString()} (statusCode: ${this.statusCode})`;
+  }
+}
+
+/**
+ * NetworkError is thrown if the request to `github.com` failed due to a network error.
+ */
+class NetworkError extends Error {
+  /**
+   * @constructor
+   * @param {string} message error message
+   * @param {Error} err underlying error
+   */
+  constructor(message, err) {
+    super(`${message}: ${err.message}`);
+    this.err = err;
+  }
+
+  get name() {
+    return this.constructor.name;
+  }
+
+  toString() {
+    return `${super.toString()} ${this.err}`;
   }
 }
 
@@ -70,7 +92,8 @@ class ResolveError extends Error {
  * @returns {Promise<Result|null>} Promise resolving to result with `sha` and `fqRef`
  *                                 or `null` if the `ref` was not found.
  * @throws {TypeError} if `owner` and/or `repo` have not been specified.
- * @throws {ResolveError} if the request to `github.com` failed.
+ * @throws {ResolveError} if the request to `github.com` failed with an HTTP error status.
+ * @throws {NetworkError} if the request to `github.com` failed due to a network error.
  */
 function resolveRef({
   owner,
@@ -171,13 +194,12 @@ function resolveRef({
       });
     }).on('error', (err) => {
       // (temporary?) network issue
-      reject(new ResolveError(
+      reject(new NetworkError(
         `failed to fetch git repo info:\n${String(err.stack)}`,
-        500,
         err,
       ));
     });
   });
 }
 
-module.exports = { resolve: resolveRef, ResolveError };
+module.exports = { resolve: resolveRef, ResolveError, NetworkError };
