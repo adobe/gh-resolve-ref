@@ -1,6 +1,6 @@
 # Resolve GitHub Reference
 
-> Resolves a refrence (a branch or tag name) of a GitHub repository to the SHA-1 of the corresponding commit.
+> Resolves a reference (a branch or tag name) of a GitHub repository to the SHA-1 of the corresponding commit.
 
 ## Status
 [![codecov](https://img.shields.io/codecov/c/github/adobe/gh-resolve-ref.svg)](https://codecov.io/gh/adobe/gh-resolve-ref)
