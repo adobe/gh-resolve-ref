@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/adobe/gh-resolve-ref/compare/v1.1.0...v1.2.0) (2021-02-15)
+
+
+### Features
+
+* enable keep-alive ([1c527d1](https://github.com/adobe/gh-resolve-ref/commit/1c527d1cb353f9761ee5c380df834621837705ab))
+
 # [1.1.0](https://github.com/adobe/gh-resolve-ref/compare/v1.0.0...v1.1.0) (2020-11-14)
 
 
