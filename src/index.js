@@ -15,6 +15,8 @@
 
 const https = require('https');
 
+const agent = new https.Agent({ keepAlive: true });
+
 const DEFAULT_BRANCH_RE = /symref=HEAD:(\S+)/;
 
 /**
@@ -110,6 +112,7 @@ function resolveRef({
     const options = {
       host: 'github.com',
       path: `/${owner}/${repo}.git/info/refs?service=git-upload-pack`,
+      agent,
     };
     if (token) {
       // the git transfer protocol supports basic auth with any user name and the token as password
